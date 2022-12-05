@@ -29,14 +29,14 @@ public class ShowTimings extends javax.swing.JFrame {
         try
        {
            Connection con = ProvideConnection.getCon();
-           PreparedStatement ps = con.prepareStatement("select *from Timings");
+           PreparedStatement ps = con.prepareStatement("SELECT * FROM Timings");
            ResultSet rs = ps.executeQuery();
            DefaultTableModel tm = (DefaultTableModel)jTable1.getModel();
            tm.setRowCount(0);
            
            while(rs.next())
            {
-               Object o[] ={rs.getString("Day"),rs.getString("Open"),rs.getString("Close")};
+               Object o[] ={rs.getString("Day"),rs.getString("from_time"),rs.getString("to_time")};
                
              tm.addRow(o);
            }
@@ -75,7 +75,7 @@ public class ShowTimings extends javax.swing.JFrame {
 
         jScrollPane1.setBackground(new java.awt.Color(0, 181, 204));
 
-        jTable1.setBackground(new java.awt.Color(0, 181, 204));
+        jTable1.setBackground(new java.awt.Color(153, 153, 153));
         jTable1.setFont(new java.awt.Font("Segoe UI", 1, 15)); // NOI18N
         jTable1.setForeground(new java.awt.Color(255, 255, 255));
         jTable1.setModel(new javax.swing.table.DefaultTableModel(

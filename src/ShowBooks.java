@@ -13,21 +13,21 @@ public class ShowBooks extends javax.swing.JFrame {
          try
        {
            Connection con = ProvideConnection.getCon();
-           PreparedStatement ps = con.prepareStatement("select *from book");
+           PreparedStatement ps = con.prepareStatement("SELECT * FROM book");
            ResultSet rs = ps.executeQuery();
            DefaultTableModel tm = (DefaultTableModel)jTable1.getModel();
            tm.setRowCount(0);
            
            while(rs.next())
            {
-               Object o[] ={rs.getString("bookID"),rs.getString("Name"),rs.getString("Price"),rs.getString("PublishingYear")};
+               Object o[] ={rs.getString("ISBN"),rs.getString("book_title"),rs.getString("language"),rs.getString("total_copies"),rs.getInt("price")};
                tm.addRow(o);
            }
            
        }
        catch(Exception e)
        {
-           JOptionPane.showMessageDialog(null,"Connection error");
+           JOptionPane.showMessageDialog(null,e);
        }
        
     }
@@ -60,7 +60,7 @@ public class ShowBooks extends javax.swing.JFrame {
 
         getContentPane().add(jPanel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 390, 450));
 
-        jTable1.setBackground(new java.awt.Color(0, 181, 204));
+        jTable1.setBackground(new java.awt.Color(0, 153, 153));
         jTable1.setFont(new java.awt.Font("Segoe UI", 1, 15)); // NOI18N
         jTable1.setForeground(new java.awt.Color(255, 255, 255));
         jTable1.setModel(new javax.swing.table.DefaultTableModel(
@@ -68,24 +68,19 @@ public class ShowBooks extends javax.swing.JFrame {
 
             },
             new String [] {
-                "BOOK ID", "BOOK NAME", "BOOK PRICE", "PUBLISHING DATE"
+                "ISBN", "Book Title", "Language", "Total Copies", "Price"
             }
         ) {
             boolean[] canEdit = new boolean [] {
-                false, false, false, false
+                false, true, true, false, false
             };
 
             public boolean isCellEditable(int rowIndex, int columnIndex) {
                 return canEdit [columnIndex];
             }
         });
+        jTable1.setSelectionBackground(new java.awt.Color(153, 153, 153));
         jScrollPane1.setViewportView(jTable1);
-        if (jTable1.getColumnModel().getColumnCount() > 0) {
-            jTable1.getColumnModel().getColumn(0).setResizable(false);
-            jTable1.getColumnModel().getColumn(1).setResizable(false);
-            jTable1.getColumnModel().getColumn(2).setResizable(false);
-            jTable1.getColumnModel().getColumn(3).setResizable(false);
-        }
 
         getContentPane().add(jScrollPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(390, 0, 460, 420));
 

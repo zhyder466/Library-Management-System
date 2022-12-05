@@ -39,14 +39,15 @@ public class Statistics extends javax.swing.JFrame {
 
         getContentPane().add(jPanel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, -1, 450));
 
-        jTable1.setBackground(new java.awt.Color(0, 181, 204));
+        jTable1.setBackground(new java.awt.Color(153, 153, 153));
         jTable1.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
+        jTable1.setForeground(new java.awt.Color(255, 255, 255));
         jTable1.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
 
             },
             new String [] {
-                "BOOK ID", "BOOK NAME", "BOOK PRICE", "PUBLISHING YEAR"
+                "ISBN", "Book Title", "Language", "Price"
             }
         ) {
             boolean[] canEdit = new boolean [] {
@@ -59,36 +60,38 @@ public class Statistics extends javax.swing.JFrame {
         });
         jScrollPane1.setViewportView(jTable1);
         if (jTable1.getColumnModel().getColumnCount() > 0) {
-            jTable1.getColumnModel().getColumn(0).setResizable(false);
-            jTable1.getColumnModel().getColumn(1).setResizable(false);
-            jTable1.getColumnModel().getColumn(2).setResizable(false);
             jTable1.getColumnModel().getColumn(3).setResizable(false);
         }
 
         getContentPane().add(jScrollPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(380, 0, 470, 140));
 
-        jTable2.setBackground(new java.awt.Color(0, 181, 204));
+        jTable2.setBackground(new java.awt.Color(153, 153, 153));
         jTable2.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
+        jTable2.setForeground(new java.awt.Color(255, 255, 255));
         jTable2.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
 
             },
             new String [] {
-                "BOOK ID", "STUDENT NAME", "ISSUE DATE", "DUE DATE", "RETURN STATUS"
+                "Borrower ID", "ISBN", "Issue Date", "Due Date", "Return Status"
             }
-        ));
+        ) {
+            boolean[] canEdit = new boolean [] {
+                false, false, false, false, false
+            };
+
+            public boolean isCellEditable(int rowIndex, int columnIndex) {
+                return canEdit [columnIndex];
+            }
+        });
         jScrollPane2.setViewportView(jTable2);
         if (jTable2.getColumnModel().getColumnCount() > 0) {
-            jTable2.getColumnModel().getColumn(0).setMinWidth(70);
-            jTable2.getColumnModel().getColumn(0).setMaxWidth(80);
-            jTable2.getColumnModel().getColumn(1).setMinWidth(120);
-            jTable2.getColumnModel().getColumn(1).setMaxWidth(150);
-            jTable2.getColumnModel().getColumn(2).setMinWidth(80);
-            jTable2.getColumnModel().getColumn(2).setMaxWidth(80);
-            jTable2.getColumnModel().getColumn(3).setMinWidth(80);
-            jTable2.getColumnModel().getColumn(3).setMaxWidth(80);
-            jTable2.getColumnModel().getColumn(4).setMinWidth(150);
-            jTable2.getColumnModel().getColumn(4).setMaxWidth(200);
+            jTable2.getColumnModel().getColumn(0).setResizable(false);
+            jTable2.getColumnModel().getColumn(0).setPreferredWidth(100);
+            jTable2.getColumnModel().getColumn(1).setResizable(false);
+            jTable2.getColumnModel().getColumn(2).setResizable(false);
+            jTable2.getColumnModel().getColumn(3).setResizable(false);
+            jTable2.getColumnModel().getColumn(4).setResizable(false);
         }
 
         getContentPane().add(jScrollPane2, new org.netbeans.lib.awtextra.AbsoluteConstraints(380, 250, 470, 130));
@@ -144,21 +147,22 @@ public class Statistics extends javax.swing.JFrame {
        try
        {
            Connection con = ProvideConnection.getCon();
-           PreparedStatement ps = con.prepareStatement("select *from book");
+           PreparedStatement ps = con.prepareStatement("SELECT * FROM book");
            ResultSet rs = ps.executeQuery();
            DefaultTableModel tm = (DefaultTableModel)jTable1.getModel();
            tm.setRowCount(0);
            
+           
            while(rs.next())
            {
-               Object o[] ={rs.getString("bookID"),rs.getString("Name"),rs.getString("Price"),rs.getString("PublishingYear")};
+               Object o[] ={rs.getString("ISBN"),rs.getString("book_title"),rs.getString("language"),rs.getString("price")};
                tm.addRow(o);
            }
-           
+  
        }
        catch(Exception e)
        {
-           JOptionPane.showMessageDialog(null,"Connection error");
+           JOptionPane.showMessageDialog(null,e);
        }
     }//GEN-LAST:event_jButton1ActionPerformed
 
@@ -166,14 +170,17 @@ public class Statistics extends javax.swing.JFrame {
         try
        {
            Connection con = ProvideConnection.getCon();
-           PreparedStatement ps = con.prepareStatement("select *from issue");
+           PreparedStatement ps = con.prepareStatement("SELECT * FROM borrow");
            ResultSet rs = ps.executeQuery();
+           
+           
+           
            DefaultTableModel tm = (DefaultTableModel)jTable2.getModel();
            tm.setRowCount(0);
            
            while(rs.next())
            {
-               Object o[] ={rs.getString("bookID"),rs.getString("StudentName"),rs.getString("IssueDate"),rs.getString("DueDate"),rs.getString("returnBook")};
+               Object o[] ={rs.getString("borrower_id"),rs.getString("ISBN"),rs.getDate("borrowed_from"),rs.getDate("borrowed_to"),rs.getString("return_status")};
                tm.addRow(o);
            }
            
@@ -194,8 +201,8 @@ public class Statistics extends javax.swing.JFrame {
         {
             Connection con = ProvideConnection.getCon();
             Statement st = con.createStatement();
-            st.executeUpdate("delete from issue where returnBook='YES'");
-            JOptionPane.showMessageDialog(null,"OLD RECORDS SUCCESSFULLY CLEARED");
+            st.executeUpdate("DELETE from borrow WHERE return_status ='YES'");
+            JOptionPane.showMessageDialog(null,"Old records successfully cleared!");
         }
         catch(Exception e)
         {

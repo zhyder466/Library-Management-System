@@ -190,6 +190,7 @@ public class Home extends javax.swing.JFrame {
     }//GEN-LAST:event_jButton9ActionPerformed
 
     private void jButton6ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton6ActionPerformed
+        //setVisible(false);
         new Timings().setVisible(true);
     }//GEN-LAST:event_jButton6ActionPerformed
 

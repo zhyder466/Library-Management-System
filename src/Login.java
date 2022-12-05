@@ -1,11 +1,18 @@
-
 import ProjectPackage.ProvideConnection;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.Statement;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
+import javax.mail.Message;
+import javax.mail.PasswordAuthentication;
+import javax.mail.Session;
+import javax.mail.Transport;
 import java.awt.Color;
+import java.time.LocalDate;
+import java.util.Properties;
+import javax.mail.internet.InternetAddress;
+import javax.mail.internet.MimeMessage;
 
 public class Login extends javax.swing.JFrame {
 
@@ -14,7 +21,71 @@ public class Login extends javax.swing.JFrame {
         setExtendedState(JFrame.MAXIMIZED_BOTH);
         
         jPanel2.setBackground(new Color(0,0,0,140));
+        int a= JOptionPane.showConfirmDialog(null,"Do you want to send reminder email to the students?","Date Overdue Reminder",JOptionPane.YES_NO_OPTION);
+        if(a!=1){
+            callSendEmail();
+        }
+        
+        
+    }
+    public void callSendEmail()
+    {
+        LocalDate lt = LocalDate.now();
+        try
+        {
+            Connection con = ProjectPackage.ProvideConnection.getCon();
+            Statement st =con.createStatement();
+            ResultSet rs = st.executeQuery("SELECT * FROM borrow WHERE return_status ='No'");
+            while(rs.next())
+            {
+                String get = rs.getString("borrowed_to");
+                String email = rs.getString("email");
+                LocalDate d = LocalDate.parse(get);
+                int cmp = d.compareTo(lt);
+                if(cmp<0)
+                {
+                   sendEmail(email);
+                    System.out.println("Message Sent");
+                }
+             }
+          }
+        catch(Exception e)
+        {
+            JOptionPane.showMessageDialog(null,e);
+        }
 
+    }
+     public void sendEmail(String to)
+    {
+        String from = "zhyder466@gmail.com";
+        String sub = "Book Overdue";
+        String content = "Your book issued date is overdue, please return the book ASAP!";
+        String host = "localhost";
+        Properties p = new Properties();
+        p.put("mail.smtp.auth", "true");
+        p.put("mail.smtp.starttls.enable", "true");
+        p.put("mail.smtp.host", "smtp.gmail.com");
+        p.put("mail.smtp.port", "587");
+        
+        Session s = Session.getDefaultInstance(p, new javax.mail.Authenticator() {
+            protected PasswordAuthentication getPasswordAuthentication()
+            {
+                return new PasswordAuthentication("zhyder466@gmail.com","kypphnpzwrlyphxb");
+            }
+        });
+        try{
+            MimeMessage m = new MimeMessage(s);
+            m.setFrom(from);
+            m.addRecipient(Message.RecipientType.TO, new InternetAddress(to));
+            m.setSubject(sub);
+            m.setText(content);
+            Transport.send(m);
+        }
+        catch(Exception e)
+        {
+            e.printStackTrace();
+        }
+        
     }
 
     @SuppressWarnings("unchecked")
@@ -170,26 +241,26 @@ public class Login extends javax.swing.JFrame {
         try {
             Connection con = ProvideConnection.getCon();
             Statement st = con.createStatement();
-            ResultSet rs = st.executeQuery("select *from signup where userName='" + username + "' and password='" + password + "'");
+            ResultSet rs = st.executeQuery("SELECT * FROM signup WHERE userName='" + username + "' AND password='" + password + "'");
 
             if (jRadioButton1.isSelected()) {
                 if (username.equals("admin") && password.equals("admin")) {
                     setVisible(false);
                     new Home().setVisible(true);
                 } else {
-                    JOptionPane.showMessageDialog(null, "INCORRECT USERNAME OR PASSWORD.");
+                    JOptionPane.showMessageDialog(null, "Incorrect username or password!");
                 }
             } else if (jRadioButton2.isSelected()) {
                 if (rs.next()) {
                     setVisible(false);
                     new StudentHome().setVisible(true);
                 } else {
-                    JOptionPane.showMessageDialog(null, "INCORRECT USERNAME OR PASSWORD.");
+                    JOptionPane.showMessageDialog(null, "Incorrect username or password!");
                 }
             } else if (!(jRadioButton1.isSelected() || jRadioButton2.isSelected())) {
-                JOptionPane.showMessageDialog(null, "PLEASE CHOOSE WHETHER YOU ARE AN ADMIN OR A STUDENT.");
+                JOptionPane.showMessageDialog(null, "Please select whether you're an admin or student!");
             } else if (jTextField1.equals("") || jPasswordField1.equals("")) {
-                JOptionPane.showMessageDialog(null, "USERNAME OR PASSWORD CAN NOT BE EMPTY.");
+                JOptionPane.showMessageDialog(null, "Username or password can not be empty!");
             }
 
         } catch (Exception e) {
